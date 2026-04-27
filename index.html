@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MR Review — ide-phoenix</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config = { darkMode: 'class' }</script>
+  <style>
+    body { background: #0f1117; color: #e2e8f0; font-family: 'Inter', system-ui, sans-serif; }
+    .card { background: #1a1d27; border: 1px solid #2d3148; }
+    .issue-card { background: #12151e; border: 1px solid #2a2d3e; }
+    .badge-critical { background: #3d1515; color: #f87171; border: 1px solid #7f1d1d; }
+    .badge-high { background: #3d2a0a; color: #fb923c; border: 1px solid #7c3802; }
+    .badge-medium { background: #2d2a0a; color: #fbbf24; border: 1px solid #78620a; }
+    .badge-low { background: #0a2d1a; color: #34d399; border: 1px solid #065f46; }
+    .badge-risk-high { background: #3d1515; color: #f87171; border: 1px solid #7f1d1d; }
+    .badge-risk-med { background: #3d2a0a; color: #fb923c; border: 1px solid #7c3802; }
+    .badge-risk-low { background: #0f2d1a; color: #6ee7b7; border: 1px solid #065f46; }
+    details > summary { cursor: pointer; list-style: none; }
+    details > summary::-webkit-details-marker { display: none; }
+    details[open] .chevron { transform: rotate(90deg); }
+    .chevron { transition: transform 0.2s; display: inline-block; }
+    .mr-link { color: #818cf8; text-decoration: none; }
+    .mr-link:hover { color: #a5b4fc; text-decoration: underline; }
+    .status-pending { background: #1e2235; color: #94a3b8; border: 1px solid #2d3557; }
+    .status-reviewed { background: #0d2d1a; color: #6ee7b7; border: 1px solid #065f46; }
+  </style>
+</head>
+<body class="min-h-screen p-6">
+
+<div class="max-w-5xl mx-auto">
+
+  <!-- Header -->
+  <div class="mb-8">
+    <div class="flex items-center gap-3 mb-2">
+      <span class="text-2xl">📋</span>
+      <h1 class="text-2xl font-bold text-white">MR Review Board</h1>
+      <span class="ml-auto text-sm text-slate-500">ide-phoenix · setelah tag <code class="text-indigo-400">1.14.7</code></span>
+    </div>
+    <p class="text-slate-400 text-sm">7 MR sudah merged ke <code class="text-slate-300">main</code> — belum naik production. Validasi sebelum tagging.</p>
+  </div>
+
+  <!-- Summary bar -->
+  <div class="card rounded-xl p-4 mb-8 flex flex-wrap gap-6 text-sm">
+    <div><span class="text-slate-400">Total MR</span> <span class="ml-2 font-bold text-white">7</span></div>
+    <div><span class="text-slate-400">Sudah direview</span> <span class="ml-2 font-bold text-emerald-400">1</span></div>
+    <div><span class="text-slate-400">Belum direview</span> <span class="ml-2 font-bold text-slate-400">6</span></div>
+    <div><span class="text-red-400">⚠</span> <span class="ml-1 text-slate-400">Ada issue kritis ditemukan</span> <span class="ml-1 font-bold text-red-400">di !556</span></div>
+  </div>
+
+  <!-- MR List -->
+  <div class="space-y-4">
+
+    <!-- !556 — HIGH RISK, sudah direview -->
+    <div class="card rounded-xl overflow-hidden">
+      <div class="p-5">
+        <div class="flex flex-wrap items-start gap-3 mb-3">
+          <a href="https://mygitlab-dev.ioh.co.id/cco/cmo/group-digital-coe/div-smb-digital-product/ide-phoenix/-/merge_requests/556" target="_blank" class="mr-link font-mono text-sm font-bold">!556</a>
+          <span class="badge-risk-high text-xs px-2 py-0.5 rounded-full font-medium">⚠ HIGH RISK</span>
+          <span class="status-reviewed text-xs px-2 py-0.5 rounded-full">✓ Sudah Direview</span>
+          <span class="ml-auto text-xs text-slate-500">33 files changed · branch: TRACING_ISSUE</span>
+        </div>
+        <h2 class="text-white font-semibold mb-1">feat: stabilize activation flow and optimize CPP Change Package handling</h2>
+        <p class="text-slate-400 text-sm">Refactor besar pada activation flow — pisah CPP Change Package dari standard activation, guard antar job, completion service rewrite.</p>
+      </div>
+
+      <details>
+        <summary class="px-5 py-3 border-t border-slate-800 text-sm text-indigo-400 hover:text-indigo-300 flex items-center gap-2">
+          <span class="chevron">▶</span> 10 Issues Ditemukan — klik untuk lihat detail
+        </summary>
+        <div class="p-5 pt-3 space-y-3">
+
+          <div class="issue-card rounded-lg p-4">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="badge-critical text-xs px-2 py-0.5 rounded font-medium">🔴 CRITICAL</span>
+              <span class="text-white text-sm font-medium">1. PostpaidChangePackageJob tidak idempotent — double call ESB</span>
+            </div>
+            <p class="text-slate-400 text-sm">File: <code class="text-slate-300">app/jobs/postpaid_change_package_job.rb</code></p>
+            <p class="text-slate-400 text-sm mt-1">Tidak ada guard <code class="text-amber-300">return if postpaid_activation.waiting?</code> di awal perform. Dengan <code class="text-amber-300">sidekiq_options retry: 5</code>, jika job crash setelah sukses call ESB tapi sebelum save_api_log selesai — rescue memanggil <code class="text-amber-300">failed!</code>, override status :waiting jadi :failed. Retry berikutnya kirim request CPP kedua ke ESB untuk MSISDN yang sama.</p>
+          </div>
+
+          <div class="issue-card rounded-lg p-4">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="badge-critical text-xs px-2 py-0.5 rounded font-medium">🔴 CRITICAL</span>
+              <span class="text-white text-sm font-medium">2. PostpaidActivationJob CPP guard — activation stuck tanpa feedback</span>
+            </div>
+            <p class="text-slate-400 text-sm">File: <code class="text-slate-300">app/jobs/postpaid_activation_job.rb</code></p>
+            <p class="text-slate-400 text-sm mt-1">Ketika <code class="text-amber-300">order.cpp_type_change_package?</code> true, hanya log error + return. Activation tetap di state awal (draft/pending) selamanya. User dan admin tidak tahu ada yang salah, harus cek log manual. Seharusnya set <code class="text-amber-300">postpaid_activation.failed!</code> sebelum return.</p>
+          </div>
+
+          <div class="issue-card rounded-lg p-4">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="badge-critical text-xs px-2 py-0.5 rounded font-medium">🔴 CRITICAL</span>
+              <span class="text-white text-sm font-medium">3. OpenStruct di CheckCppStatusJob simulation — silent nil data</span>
+            </div>
+            <p class="text-slate-400 text-sm">File: <code class="text-slate-300">app/jobs/check_cpp_status_job.rb</code></p>
+            <p class="text-slate-400 text-sm mt-1">Simulated service memakai <code class="text-amber-300">OpenStruct.new(...)</code>. Jika <code class="text-amber-300">update_activation_success</code> akses field yang tidak ada, tidak raise error — return nil silently. Data nil tersimpan ke database tanpa error apapun. Seharusnya pakai <code class="text-amber-300">Struct.new</code> yang strict.</p>
+          </div>
+
+          <div class="issue-card rounded-lg p-4">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="badge-high text-xs px-2 py-0.5 rounded font-medium">🟠 HIGH</span>
+              <span class="text-white text-sm font-medium">4. Hardcoded string Indonesian di all_activation action</span>
+            </div>
+            <p class="text-slate-400 text-sm">File: <code class="text-slate-300">app/controllers/customers/activations_controller.rb</code></p>
+            <p class="text-slate-400 text-sm mt-1"><code class="text-amber-300">flash[:alert] = "Aksi ini tidak berlaku untuk order ubah paket."</code> — hardcoded. Inconsistent dengan <code class="text-amber-300">sync_change_package</code> di file yang sama yang sudah pakai <code class="text-amber-300">I18n.t()</code>.</p>
+          </div>
+
+          <div class="issue-card rounded-lg p-4">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="badge-high text-xs px-2 py-0.5 rounded font-medium">🟠 HIGH</span>
+              <span class="text-white text-sm font-medium">5. rescue di PostpaidChangePackageJob override status tanpa cek konteks</span>
+            </div>
+            <p class="text-slate-400 text-sm">File: <code class="text-slate-300">app/jobs/postpaid_change_package_job.rb</code></p>
+            <p class="text-slate-400 text-sm mt-1">Jika error di <code class="text-amber-300">save_api_log</code> (setelah activation sudah :waiting), rescue paksa set :failed. ESB sudah terima request, internal state salah. CheckCppStatusJob tidak poll activation yang :failed — CPP selesai di ESB tapi sistem tidak tahu.</p>
+          </div>
+
+          <div class="issue-card rounded-lg p-4">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="badge-high text-xs px-2 py-0.5 rounded font-medium">🟠 HIGH</span>
+              <span class="text-white text-sm font-medium">6. Potensi N+1 di view _postpaid_activations.html.erb</span>
+            </div>
+            <p class="text-slate-400 text-sm">File: <code class="text-slate-300">app/views/shared/orders/_postpaid_activations.html.erb</code></p>
+            <p class="text-slate-400 text-sm mt-1"><code class="text-amber-300">order.postpaid_activations.any? &#123; |pa| pa.retry_reservation? &#125;</code> — iterasi Ruby di view. Jika partial di-render dari konteks tanpa eager-load yang sesuai, trigger N+1 query.</p>
+          </div>
+
+          <div class="issue-card rounded-lg p-4">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="badge-medium text-xs px-2 py-0.5 rounded font-medium">🟡 MEDIUM</span>
+              <span class="text-white text-sm font-medium">7. already_activated — dead variable, intent tidak jelas</span>
+            </div>
+            <p class="text-slate-400 text-sm">File: <code class="text-slate-300">app/services/activations/completion_service.rb</code></p>
+            <p class="text-slate-400 text-sm mt-1">Variable di-set tapi tidak pernah dipakai sebagai guard. <code class="text-amber-300">check_and_complete_order</code> selalu dipanggil meski <code class="text-amber-300">already_activated = true</code>. Tidak crash (ada internal guard), tapi dead code yang membingungkan.</p>
+          </div>
+
+          <div class="issue-card rounded-lg p-4">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="badge-medium text-xs px-2 py-0.5 rounded font-medium">🟡 MEDIUM</span>
+              <span class="text-white text-sm font-medium">8. Hilangnya .with_msisdn scope di PostpaidActivationJob</span>
+            </div>
+            <p class="text-slate-400 text-sm">File: <code class="text-slate-300">app/jobs/postpaid_activation_job.rb</code></p>
+            <p class="text-slate-400 text-sm mt-1">Diubah dari <code class="text-amber-300">PostpaidActivation.with_msisdn.find(...)</code> ke <code class="text-amber-300">PostpaidActivation.find(...)</code>. Akses <code class="text-amber-300">msisdn_number</code> di job body akan lazy load — extra query per job execution saat banyak aktivasi.</p>
+          </div>
+
+          <div class="issue-card rounded-lg p-4">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="badge-medium text-xs px-2 py-0.5 rounded font-medium">🟡 MEDIUM</span>
+              <span class="text-white text-sm font-medium">9. Error recovery ChangePackageService kalau enqueue gagal di tengah</span>
+            </div>
+            <p class="text-slate-400 text-sm">File: <code class="text-slate-300">app/services/orders/change_package_service.rb</code></p>
+            <p class="text-slate-400 text-sm mt-1">Activation sudah di-update ke :pending via <code class="text-amber-300">update_all</code> sebelum loop enqueue dimulai. Jika enqueue gagal mid-loop (Redis down dll), sebagian activation stuck di :pending tanpa job yang berjalan. Tidak ada rollback.</p>
+          </div>
+
+          <div class="issue-card rounded-lg p-4">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="badge-medium text-xs px-2 py-0.5 rounded font-medium">🟡 MEDIUM</span>
+              <span class="text-white text-sm font-medium">10. postpaid_activation_job_spec.rb dihapus seluruhnya</span>
+            </div>
+            <p class="text-slate-400 text-sm">File: <code class="text-slate-300">spec/jobs/postpaid_activation_job_spec.rb</code></p>
+            <p class="text-slate-400 text-sm mt-1">47 baris test dihapus, tidak ada pengganti yang cover behavior lama. Token failure, activation state transitions — tidak lagi punya test coverage.</p>
+          </div>
+
+        </div>
+      </details>
+    </div>
+
+    <!-- MR Template: belum direview -->
+
+    <!-- !563 -->
+    <div class="card rounded-xl p-5">
+      <div class="flex flex-wrap items-start gap-3 mb-3">
+        <a href="https://mygitlab-dev.ioh.co.id/cco/cmo/group-digital-coe/div-smb-digital-product/ide-phoenix/-/merge_requests/563" target="_blank" class="mr-link font-mono text-sm font-bold">!563</a>
+        <span class="badge-risk-med text-xs px-2 py-0.5 rounded-full font-medium">⚡ Belum direview</span>
+        <span class="ml-auto text-xs text-slate-500">branch: PHB-3264-waive-fee-...</span>
+      </div>
+      <h2 class="text-white font-semibold mb-1">[PHB-3264] Add flagging for document uploaded in previous order</h2>
+      <p class="text-slate-400 text-sm">Penandaan dokumen dari order sebelumnya — perlu validasi dampak ke verification flow dan dokumen baru.</p>
+    </div>
+
+    <!-- !559 -->
+    <div class="card rounded-xl p-5">
+      <div class="flex flex-wrap items-start gap-3 mb-3">
+        <a href="https://mygitlab-dev.ioh.co.id/cco/cmo/group-digital-coe/div-smb-digital-product/ide-phoenix/-/merge_requests/559" target="_blank" class="mr-link font-mono text-sm font-bold">!559</a>
+        <span class="badge-risk-med text-xs px-2 py-0.5 rounded-full font-medium">⚡ Belum direview</span>
+        <span class="ml-auto text-xs text-slate-500">branch: PHB-3260-upload-fab-and-fpn-doc-to-siebel</span>
+      </div>
+      <h2 class="text-white font-semibold mb-1">[PHB-3260] feat(siebel): ensure complete document sync for active orders</h2>
+      <p class="text-slate-400 text-sm">Sinkronisasi dokumen ke Siebel — perlu cek apakah ada edge case order yang dokumennya sudah parsial.</p>
+    </div>
+
+    <!-- !558 -->
+    <div class="card rounded-xl p-5">
+      <div class="flex flex-wrap items-start gap-3 mb-3">
+        <a href="https://mygitlab-dev.ioh.co.id/cco/cmo/group-digital-coe/div-smb-digital-product/ide-phoenix/-/merge_requests/558" target="_blank" class="mr-link font-mono text-sm font-bold">!558</a>
+        <span class="badge-risk-med text-xs px-2 py-0.5 rounded-full font-medium">⚡ Belum direview</span>
+        <span class="ml-auto text-xs text-slate-500">branch: s68/study/dashboard-usage-quota-product-types</span>
+      </div>
+      <h2 class="text-white font-semibold mb-1">[feat] Add usage dashboard and quota fields for platinum_retail product type</h2>
+      <p class="text-slate-400 text-sm">Tambah field quota dan usage dashboard untuk tipe produk platinum_retail.</p>
+    </div>
+
+    <!-- !557 -->
+    <div class="card rounded-xl p-5">
+      <div class="flex flex-wrap items-start gap-3 mb-3">
+        <a href="https://mygitlab-dev.ioh.co.id/cco/cmo/group-digital-coe/div-smb-digital-product/ide-phoenix/-/merge_requests/557" target="_blank" class="mr-link font-mono text-sm font-bold">!557</a>
+        <span class="badge-risk-med text-xs px-2 py-0.5 rounded-full font-medium">⚡ Belum direview</span>
+        <span class="ml-auto text-xs text-slate-500">branch: enhancement/label-group-feature</span>
+      </div>
+      <h2 class="text-white font-semibold mb-1">Label group feature: delete group, sort enhancement, i18n</h2>
+      <p class="text-slate-400 text-sm">Fitur label group — delete, sorting, dan perbaikan i18n.</p>
+    </div>
+
+    <!-- !555 -->
+    <div class="card rounded-xl p-5">
+      <div class="flex flex-wrap items-start gap-3 mb-3">
+        <a href="https://mygitlab-dev.ioh.co.id/cco/cmo/group-digital-coe/div-smb-digital-product/ide-phoenix/-/merge_requests/555" target="_blank" class="mr-link font-mono text-sm font-bold">!555</a>
+        <span class="badge-risk-med text-xs px-2 py-0.5 rounded-full font-medium">⚡ Belum direview</span>
+        <span class="ml-auto text-xs text-slate-500">branch: s68/phb-3262/fix-manage-order-search-sort-filter</span>
+      </div>
+      <h2 class="text-white font-semibold mb-1">[PHB-3262] fix: manage order search, sort, filter, and sim card 500 error</h2>
+      <p class="text-slate-400 text-sm">Fix search/sort/filter pada manage order dan 500 error di sim card.</p>
+    </div>
+
+    <!-- !554 -->
+    <div class="card rounded-xl p-5">
+      <div class="flex flex-wrap items-start gap-3 mb-3">
+        <a href="https://mygitlab-dev.ioh.co.id/cco/cmo/group-digital-coe/div-smb-digital-product/ide-phoenix/-/merge_requests/554" target="_blank" class="mr-link font-mono text-sm font-bold">!554</a>
+        <span class="badge-risk-med text-xs px-2 py-0.5 rounded-full font-medium">⚡ Belum direview</span>
+        <span class="ml-auto text-xs text-slate-500">branch: PHB-3264-waive-fee-...</span>
+      </div>
+      <h2 class="text-white font-semibold mb-1">[PHB-3264] feat: adjust verification flow for fixed quota orders and returning customers</h2>
+      <p class="text-slate-400 text-sm">Penyesuaian verification flow untuk fixed quota dan returning customers.</p>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <div class="mt-10 text-center text-xs text-slate-600">
+    Dibuat oleh Semar · Punakawan AI · review.hanif.app
+  </div>
+
+</div>
+
+</body>
+</html>
