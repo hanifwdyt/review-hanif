@@ -173,7 +173,7 @@
         <div class="flex flex-wrap items-start gap-3 mb-3">
           <a href="https://mygitlab-dev.ioh.co.id/cco/cmo/group-digital-coe/div-smb-digital-product/ide-phoenix/-/merge_requests/563" target="_blank" class="mr-link font-mono text-sm font-bold">!563</a>
           <span class="badge-risk-med text-xs px-2 py-0.5 rounded-full font-medium">⚠ MED-HIGH</span>
-          <span class="status-reviewed text-xs px-2 py-0.5 rounded-full">✓ 6 issues</span>
+          <span class="status-reviewed text-xs px-2 py-0.5 rounded-full">✓ 8 issues</span>
           <span class="ml-auto text-xs text-slate-500">8 files · PHB-3264-flagging</span>
         </div>
         <h2 class="text-white font-semibold mb-1">[PHB-3264] Add flagging for document uploaded in previous order</h2>
@@ -236,8 +236,28 @@
 
           <div class="issue-card rounded-lg p-4">
             <div class="flex items-center gap-2 mb-2">
+              <span class="badge-critical text-xs px-2 py-0.5 rounded font-medium">🔴 CRITICAL</span>
+              <span class="text-white text-sm font-medium">6. View button previous order pakai rails_blob_path — bypass authorization</span>
+            </div>
+            <p class="text-slate-400 text-sm">File: <code class="text-slate-300">app/views/shared/_document_approval_list.html.erb</code></p>
+            <p class="text-slate-400 text-sm mt-1">Link View untuk dokumen dari previous order pakai <code class="text-amber-300">rails_blob_path(prev_order.send(document_type), ...)</code> — ini URL signed time-limited ke blob langsung, tanpa cek <code>secured_document?</code> policy. Siapa saja yang punya URL bisa akses dokumen KYC sensitif tanpa authentikasi. Beda dengan View button current order yang lewat <code class="text-amber-300">sales_document_preview_page_portal_sales_order_path</code> (controller + policy check).</p>
+            <p class="text-slate-500 text-xs mt-1 italic">Fix: pakai <code>portal_secured_document_path(prev_order, document_type: document_type)</code> atau endpoint custom yang verify authorization sebelum serve blob.</p>
+          </div>
+
+          <div class="issue-card rounded-lg p-4">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="badge-high text-xs px-2 py-0.5 rounded font-medium">🟠 HIGH</span>
+              <span class="text-white text-sm font-medium">7. NPWP name/address mismatch antara dokumen prev order dan data current customer</span>
+            </div>
+            <p class="text-slate-400 text-sm">File: <code class="text-slate-300">app/views/shared/_document_approval_list.html.erb</code></p>
+            <p class="text-slate-400 text-sm mt-1">Ketika <code>document_type == 'npwp'</code> dan ada prev_order dengan NPWP, view menampilkan: (1) dokumen PDF dari prev_order — mungkin punya nama/alamat lama, tapi (2) NPWP name/address inline edit di bawah tetap tampil dari <code class="text-amber-300">customer.npwp_name</code> dan <code class="text-amber-300">customer.npwp_address</code> (data current). Jika data NPWP customer sudah berubah sejak order lama, verificator lihat PDF lama tapi inline data berbeda — bisa approve berdasarkan data yang salah.</p>
+            <p class="text-slate-500 text-xs mt-1 italic">Fix: saat dokumen dari prev_order, tampilkan NPWP name/address dari prev_order.customer (snapshot lama), atau sembunyikan inline edit karena dokumen yang dipakai adalah dari order sebelumnya.</p>
+          </div>
+
+          <div class="issue-card rounded-lg p-4">
+            <div class="flex items-center gap-2 mb-2">
               <span class="badge-low text-xs px-2 py-0.5 rounded font-medium">🟢 LOW</span>
-              <span class="text-white text-sm font-medium">6. Test memoization terlalu lemah</span>
+              <span class="text-white text-sm font-medium">8. Test memoization terlalu lemah</span>
             </div>
             <p class="text-slate-400 text-sm">File: <code class="text-slate-300">spec/models/order_spec.rb</code></p>
             <p class="text-slate-400 text-sm mt-1">Test pakai <code>.where.twice</code> mock tanpa verify actual query count reduce. Cache rusak, test masih hijau.</p>
