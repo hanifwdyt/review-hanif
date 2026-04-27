@@ -44,22 +44,24 @@
   <!-- Summary bar -->
   <div class="card rounded-xl p-4 mb-8 flex flex-wrap gap-6 text-sm">
     <div><span class="text-slate-400">Total MR</span> <span class="ml-2 font-bold text-white">7</span></div>
-    <div><span class="text-slate-400">Sudah direview</span> <span class="ml-2 font-bold text-emerald-400">1</span></div>
-    <div><span class="text-slate-400">Belum direview</span> <span class="ml-2 font-bold text-slate-400">6</span></div>
-    <div><span class="text-red-400">⚠</span> <span class="ml-1 text-slate-400">Ada issue kritis ditemukan</span> <span class="ml-1 font-bold text-red-400">di !556</span></div>
+    <div><span class="text-slate-400">Sudah direview</span> <span class="ml-2 font-bold text-emerald-400">7</span></div>
+    <div><span class="text-slate-400">Total issue ditemukan</span> <span class="ml-2 font-bold text-amber-400">~50</span></div>
+    <div><span class="text-red-400">⚠</span> <span class="ml-1 text-slate-400">CRITICAL/HIGH ada di</span> <span class="ml-1 font-bold text-red-400">!556, !557, !559, !563</span></div>
   </div>
+
+  <p class="text-xs text-slate-500 mb-4 italic">Catatan: temuan ini dari pattern review otomatis — beberapa mungkin false positive. Validasi manual tetap perlu sebelum tag production.</p>
 
   <!-- MR List -->
   <div class="space-y-4">
 
-    <!-- !556 — HIGH RISK, sudah direview -->
+    <!-- ============== !556 — HIGH RISK ============== -->
     <div class="card rounded-xl overflow-hidden">
       <div class="p-5">
         <div class="flex flex-wrap items-start gap-3 mb-3">
           <a href="https://mygitlab-dev.ioh.co.id/cco/cmo/group-digital-coe/div-smb-digital-product/ide-phoenix/-/merge_requests/556" target="_blank" class="mr-link font-mono text-sm font-bold">!556</a>
           <span class="badge-risk-high text-xs px-2 py-0.5 rounded-full font-medium">⚠ HIGH RISK</span>
-          <span class="status-reviewed text-xs px-2 py-0.5 rounded-full">✓ Sudah Direview</span>
-          <span class="ml-auto text-xs text-slate-500">33 files changed · branch: TRACING_ISSUE</span>
+          <span class="status-reviewed text-xs px-2 py-0.5 rounded-full">✓ 10 issues</span>
+          <span class="ml-auto text-xs text-slate-500">33 files · TRACING_ISSUE</span>
         </div>
         <h2 class="text-white font-semibold mb-1">feat: stabilize activation flow and optimize CPP Change Package handling</h2>
         <p class="text-slate-400 text-sm">Refactor besar pada activation flow — pisah CPP Change Package dari standard activation, guard antar job, completion service rewrite.</p>
@@ -67,7 +69,7 @@
 
       <details>
         <summary class="px-5 py-3 border-t border-slate-800 text-sm text-indigo-400 hover:text-indigo-300 flex items-center gap-2">
-          <span class="chevron">▶</span> 10 Issues Ditemukan — klik untuk lihat detail
+          <span class="chevron">▶</span> 10 Issues — klik untuk lihat detail
         </summary>
         <div class="p-5 pt-3 space-y-3">
 
@@ -86,7 +88,7 @@
               <span class="text-white text-sm font-medium">2. PostpaidActivationJob CPP guard — activation stuck tanpa feedback</span>
             </div>
             <p class="text-slate-400 text-sm">File: <code class="text-slate-300">app/jobs/postpaid_activation_job.rb</code></p>
-            <p class="text-slate-400 text-sm mt-1">Ketika <code class="text-amber-300">order.cpp_type_change_package?</code> true, hanya log error + return. Activation tetap di state awal (draft/pending) selamanya. User dan admin tidak tahu ada yang salah, harus cek log manual. Seharusnya set <code class="text-amber-300">postpaid_activation.failed!</code> sebelum return.</p>
+            <p class="text-slate-400 text-sm mt-1">Ketika <code class="text-amber-300">order.cpp_type_change_package?</code> true, hanya log error + return. Activation tetap di state awal (draft/pending) selamanya. User dan admin tidak tahu ada yang salah.</p>
           </div>
 
           <div class="issue-card rounded-lg p-4">
@@ -95,7 +97,7 @@
               <span class="text-white text-sm font-medium">3. OpenStruct di CheckCppStatusJob simulation — silent nil data</span>
             </div>
             <p class="text-slate-400 text-sm">File: <code class="text-slate-300">app/jobs/check_cpp_status_job.rb</code></p>
-            <p class="text-slate-400 text-sm mt-1">Simulated service memakai <code class="text-amber-300">OpenStruct.new(...)</code>. Jika <code class="text-amber-300">update_activation_success</code> akses field yang tidak ada, tidak raise error — return nil silently. Data nil tersimpan ke database tanpa error apapun. Seharusnya pakai <code class="text-amber-300">Struct.new</code> yang strict.</p>
+            <p class="text-slate-400 text-sm mt-1">Simulated service memakai <code class="text-amber-300">OpenStruct.new(...)</code>. Jika <code class="text-amber-300">update_activation_success</code> akses field yang tidak ada, return nil silently. Data nil tersimpan ke database tanpa error.</p>
           </div>
 
           <div class="issue-card rounded-lg p-4">
@@ -104,7 +106,7 @@
               <span class="text-white text-sm font-medium">4. Hardcoded string Indonesian di all_activation action</span>
             </div>
             <p class="text-slate-400 text-sm">File: <code class="text-slate-300">app/controllers/customers/activations_controller.rb</code></p>
-            <p class="text-slate-400 text-sm mt-1"><code class="text-amber-300">flash[:alert] = "Aksi ini tidak berlaku untuk order ubah paket."</code> — hardcoded. Inconsistent dengan <code class="text-amber-300">sync_change_package</code> di file yang sama yang sudah pakai <code class="text-amber-300">I18n.t()</code>.</p>
+            <p class="text-slate-400 text-sm mt-1"><code class="text-amber-300">flash[:alert] = "Aksi ini tidak berlaku untuk order ubah paket."</code> — hardcoded. Inconsistent dengan sync_change_package yang sudah pakai I18n.t().</p>
           </div>
 
           <div class="issue-card rounded-lg p-4">
@@ -113,7 +115,7 @@
               <span class="text-white text-sm font-medium">5. rescue di PostpaidChangePackageJob override status tanpa cek konteks</span>
             </div>
             <p class="text-slate-400 text-sm">File: <code class="text-slate-300">app/jobs/postpaid_change_package_job.rb</code></p>
-            <p class="text-slate-400 text-sm mt-1">Jika error di <code class="text-amber-300">save_api_log</code> (setelah activation sudah :waiting), rescue paksa set :failed. ESB sudah terima request, internal state salah. CheckCppStatusJob tidak poll activation yang :failed — CPP selesai di ESB tapi sistem tidak tahu.</p>
+            <p class="text-slate-400 text-sm mt-1">Jika error di save_api_log (setelah activation sudah :waiting), rescue paksa set :failed. ESB sudah terima request, internal state salah. CheckCppStatusJob tidak poll activation yang :failed.</p>
           </div>
 
           <div class="issue-card rounded-lg p-4">
@@ -122,7 +124,7 @@
               <span class="text-white text-sm font-medium">6. Potensi N+1 di view _postpaid_activations.html.erb</span>
             </div>
             <p class="text-slate-400 text-sm">File: <code class="text-slate-300">app/views/shared/orders/_postpaid_activations.html.erb</code></p>
-            <p class="text-slate-400 text-sm mt-1"><code class="text-amber-300">order.postpaid_activations.any? &#123; |pa| pa.retry_reservation? &#125;</code> — iterasi Ruby di view. Jika partial di-render dari konteks tanpa eager-load yang sesuai, trigger N+1 query.</p>
+            <p class="text-slate-400 text-sm mt-1"><code class="text-amber-300">order.postpaid_activations.any? &#123; |pa| pa.retry_reservation? &#125;</code> — iterasi Ruby di view, trigger N+1 jika tidak ada eager-load yang sesuai.</p>
           </div>
 
           <div class="issue-card rounded-lg p-4">
@@ -131,7 +133,7 @@
               <span class="text-white text-sm font-medium">7. already_activated — dead variable, intent tidak jelas</span>
             </div>
             <p class="text-slate-400 text-sm">File: <code class="text-slate-300">app/services/activations/completion_service.rb</code></p>
-            <p class="text-slate-400 text-sm mt-1">Variable di-set tapi tidak pernah dipakai sebagai guard. <code class="text-amber-300">check_and_complete_order</code> selalu dipanggil meski <code class="text-amber-300">already_activated = true</code>. Tidak crash (ada internal guard), tapi dead code yang membingungkan.</p>
+            <p class="text-slate-400 text-sm mt-1">Variable di-set tapi tidak pernah dipakai sebagai guard. check_and_complete_order selalu dipanggil meski already_activated = true.</p>
           </div>
 
           <div class="issue-card rounded-lg p-4">
@@ -140,7 +142,7 @@
               <span class="text-white text-sm font-medium">8. Hilangnya .with_msisdn scope di PostpaidActivationJob</span>
             </div>
             <p class="text-slate-400 text-sm">File: <code class="text-slate-300">app/jobs/postpaid_activation_job.rb</code></p>
-            <p class="text-slate-400 text-sm mt-1">Diubah dari <code class="text-amber-300">PostpaidActivation.with_msisdn.find(...)</code> ke <code class="text-amber-300">PostpaidActivation.find(...)</code>. Akses <code class="text-amber-300">msisdn_number</code> di job body akan lazy load — extra query per job execution saat banyak aktivasi.</p>
+            <p class="text-slate-400 text-sm mt-1">Diubah dari PostpaidActivation.with_msisdn.find(...) ke PostpaidActivation.find(...). Akses msisdn_number lazy load — extra query per job execution.</p>
           </div>
 
           <div class="issue-card rounded-lg p-4">
@@ -149,7 +151,7 @@
               <span class="text-white text-sm font-medium">9. Error recovery ChangePackageService kalau enqueue gagal di tengah</span>
             </div>
             <p class="text-slate-400 text-sm">File: <code class="text-slate-300">app/services/orders/change_package_service.rb</code></p>
-            <p class="text-slate-400 text-sm mt-1">Activation sudah di-update ke :pending via <code class="text-amber-300">update_all</code> sebelum loop enqueue dimulai. Jika enqueue gagal mid-loop (Redis down dll), sebagian activation stuck di :pending tanpa job yang berjalan. Tidak ada rollback.</p>
+            <p class="text-slate-400 text-sm mt-1">Activation di-update ke :pending via update_all sebelum loop enqueue. Jika enqueue gagal mid-loop (Redis down), sebagian activation stuck di :pending tanpa job. Tidak ada rollback.</p>
           </div>
 
           <div class="issue-card rounded-lg p-4">
@@ -158,87 +160,479 @@
               <span class="text-white text-sm font-medium">10. postpaid_activation_job_spec.rb dihapus seluruhnya</span>
             </div>
             <p class="text-slate-400 text-sm">File: <code class="text-slate-300">spec/jobs/postpaid_activation_job_spec.rb</code></p>
-            <p class="text-slate-400 text-sm mt-1">47 baris test dihapus, tidak ada pengganti yang cover behavior lama. Token failure, activation state transitions — tidak lagi punya test coverage.</p>
+            <p class="text-slate-400 text-sm mt-1">47 baris test dihapus, tidak ada pengganti yang cover behavior lama.</p>
           </div>
 
         </div>
       </details>
     </div>
 
-    <!-- MR Template: belum direview -->
-
-    <!-- !563 -->
-    <div class="card rounded-xl p-5">
-      <div class="flex flex-wrap items-start gap-3 mb-3">
-        <a href="https://mygitlab-dev.ioh.co.id/cco/cmo/group-digital-coe/div-smb-digital-product/ide-phoenix/-/merge_requests/563" target="_blank" class="mr-link font-mono text-sm font-bold">!563</a>
-        <span class="badge-risk-med text-xs px-2 py-0.5 rounded-full font-medium">⚡ Belum direview</span>
-        <span class="ml-auto text-xs text-slate-500">branch: PHB-3264-waive-fee-...</span>
+    <!-- ============== !563 ============== -->
+    <div class="card rounded-xl overflow-hidden">
+      <div class="p-5">
+        <div class="flex flex-wrap items-start gap-3 mb-3">
+          <a href="https://mygitlab-dev.ioh.co.id/cco/cmo/group-digital-coe/div-smb-digital-product/ide-phoenix/-/merge_requests/563" target="_blank" class="mr-link font-mono text-sm font-bold">!563</a>
+          <span class="badge-risk-med text-xs px-2 py-0.5 rounded-full font-medium">⚠ MED-HIGH</span>
+          <span class="status-reviewed text-xs px-2 py-0.5 rounded-full">✓ 6 issues</span>
+          <span class="ml-auto text-xs text-slate-500">8 files · PHB-3264-flagging</span>
+        </div>
+        <h2 class="text-white font-semibold mb-1">[PHB-3264] Add flagging for document uploaded in previous order</h2>
+        <p class="text-slate-400 text-sm">Penandaan dokumen dari order sebelumnya — fitur inheritance dokumen lintas order untuk customer yang sama.</p>
       </div>
-      <h2 class="text-white font-semibold mb-1">[PHB-3264] Add flagging for document uploaded in previous order</h2>
-      <p class="text-slate-400 text-sm">Penandaan dokumen dari order sebelumnya — perlu validasi dampak ke verification flow dan dokumen baru.</p>
+
+      <details>
+        <summary class="px-5 py-3 border-t border-slate-800 text-sm text-indigo-400 hover:text-indigo-300 flex items-center gap-2">
+          <span class="chevron">▶</span> 6 Issues — klik untuk lihat detail
+        </summary>
+        <div class="p-5 pt-3 space-y-3">
+
+          <div class="issue-card rounded-lg p-4">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="badge-critical text-xs px-2 py-0.5 rounded font-medium">🔴 CRITICAL</span>
+              <span class="text-white text-sm font-medium">1. Authorization terlalu luas — sales bisa akses dokumen order lain</span>
+            </div>
+            <p class="text-slate-400 text-sm">File: <code class="text-slate-300">app/policies/order_policy.rb</code></p>
+            <p class="text-slate-400 text-sm mt-1">Method <code class="text-amber-300">user_is_sales_for_customer?</code> kasih akses secured_document jika user adalah sales untuk ANY order milik customer X. Sales rep order A bisa lihat dokumen order B (different sales, same customer). Violates least-privilege & order boundary security.</p>
+            <p class="text-slate-500 text-xs mt-1 italic">Fix: tambah cek apakah user adalah sales_id untuk THIS order spesifik, atau whitelist hanya inheritable documents.</p>
+          </div>
+
+          <div class="issue-card rounded-lg p-4">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="badge-high text-xs px-2 py-0.5 rounded font-medium">🟠 HIGH</span>
+              <span class="text-white text-sm font-medium">2. State leak: customer.orders tanpa explicit customer_id check</span>
+            </div>
+            <p class="text-slate-400 text-sm">File: <code class="text-slate-300">app/models/order.rb</code></p>
+            <p class="text-slate-400 text-sm mt-1">Query pakai <code class="text-amber-300">customer.orders</code> — bergantung pada order.customer association yg bisa nil/stale. Multi-tenant scenario bisa expose order milik customer lain.</p>
+            <p class="text-slate-500 text-xs mt-1 italic">Fix: pakai <code>Order.where(customer_id: self.customer_id)</code> eksplisit + guard nil.</p>
+          </div>
+
+          <div class="issue-card rounded-lg p-4">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="badge-high text-xs px-2 py-0.5 rounded font-medium">🟠 HIGH</span>
+              <span class="text-white text-sm font-medium">3. Active Storage join syntax — perlu verifikasi runtime</span>
+            </div>
+            <p class="text-slate-400 text-sm">File: <code class="text-slate-300">app/models/order.rb</code></p>
+            <p class="text-slate-400 text-sm mt-1">Pakai <code class="text-amber-300">.joins("#{document_type}_attachment".to_sym)</code> untuk dynamic Active Storage join. Walaupun Rails has_one_attached generate association <code>akta_attachment</code>, dynamic symbol generation rawan typo dan tidak validate document_type. Jika document_type bukan dari whitelist → bisa raise atau return wrong.</p>
+            <p class="text-slate-500 text-xs mt-1 italic">Fix: validasi document_type vs <code>DocumentApproval::DOCUMENT_TYPES</code> dulu sebelum dynamic join.</p>
+          </div>
+
+          <div class="issue-card rounded-lg p-4">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="badge-medium text-xs px-2 py-0.5 rounded font-medium">🟡 MEDIUM</span>
+              <span class="text-white text-sm font-medium">4. Silent nil saat document_type invalid</span>
+            </div>
+            <p class="text-slate-400 text-sm">File: <code class="text-slate-300">app/models/order.rb</code></p>
+            <p class="text-slate-400 text-sm mt-1">Tidak ada validasi document_type dari <code>DocumentApproval::DOCUMENT_TYPES</code>. Invalid type silent return nil — sembunyikan bug dev/integration.</p>
+          </div>
+
+          <div class="issue-card rounded-lg p-4">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="badge-medium text-xs px-2 py-0.5 rounded font-medium">🟡 MEDIUM</span>
+              <span class="text-white text-sm font-medium">5. Kontradiksi logika fpn — non-inheritable tapi required</span>
+            </div>
+            <p class="text-slate-400 text-sm">File: <code class="text-slate-300">app/models/order.rb</code></p>
+            <p class="text-slate-400 text-sm mt-1">fpn masuk <code>NON_INHERITABLE_DOCUMENTS</code> tapi <code>requires_fpn_document?</code> = true untuk add_member orders. Kalau add_member memang butuh inheritance fpn, ini contradicting business logic.</p>
+          </div>
+
+          <div class="issue-card rounded-lg p-4">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="badge-low text-xs px-2 py-0.5 rounded font-medium">🟢 LOW</span>
+              <span class="text-white text-sm font-medium">6. Test memoization terlalu lemah</span>
+            </div>
+            <p class="text-slate-400 text-sm">File: <code class="text-slate-300">spec/models/order_spec.rb</code></p>
+            <p class="text-slate-400 text-sm mt-1">Test pakai <code>.where.twice</code> mock tanpa verify actual query count reduce. Cache rusak, test masih hijau.</p>
+            <p class="text-slate-500 text-xs mt-1 italic">Fix: pakai <code>ActiveRecord::QueryRecorder</code> untuk count real DB queries.</p>
+          </div>
+
+        </div>
+      </details>
     </div>
 
-    <!-- !559 -->
-    <div class="card rounded-xl p-5">
-      <div class="flex flex-wrap items-start gap-3 mb-3">
-        <a href="https://mygitlab-dev.ioh.co.id/cco/cmo/group-digital-coe/div-smb-digital-product/ide-phoenix/-/merge_requests/559" target="_blank" class="mr-link font-mono text-sm font-bold">!559</a>
-        <span class="badge-risk-med text-xs px-2 py-0.5 rounded-full font-medium">⚡ Belum direview</span>
-        <span class="ml-auto text-xs text-slate-500">branch: PHB-3260-upload-fab-and-fpn-doc-to-siebel</span>
+    <!-- ============== !559 ============== -->
+    <div class="card rounded-xl overflow-hidden">
+      <div class="p-5">
+        <div class="flex flex-wrap items-start gap-3 mb-3">
+          <a href="https://mygitlab-dev.ioh.co.id/cco/cmo/group-digital-coe/div-smb-digital-product/ide-phoenix/-/merge_requests/559" target="_blank" class="mr-link font-mono text-sm font-bold">!559</a>
+          <span class="badge-risk-high text-xs px-2 py-0.5 rounded-full font-medium">⚠ HIGH RISK</span>
+          <span class="status-reviewed text-xs px-2 py-0.5 rounded-full">✓ 5 issues</span>
+          <span class="ml-auto text-xs text-slate-500">2 files · PHB-3260-siebel-sync</span>
+        </div>
+        <h2 class="text-white font-semibold mb-1">[PHB-3260] feat(siebel): ensure complete document sync for active orders</h2>
+        <p class="text-slate-400 text-sm">Ubah query filter dokumen yang sync ke Siebel SFTP — termasuk skipped/non-approved untuk active orders.</p>
       </div>
-      <h2 class="text-white font-semibold mb-1">[PHB-3260] feat(siebel): ensure complete document sync for active orders</h2>
-      <p class="text-slate-400 text-sm">Sinkronisasi dokumen ke Siebel — perlu cek apakah ada edge case order yang dokumennya sudah parsial.</p>
+
+      <details>
+        <summary class="px-5 py-3 border-t border-slate-800 text-sm text-indigo-400 hover:text-indigo-300 flex items-center gap-2">
+          <span class="chevron">▶</span> 5 Issues — klik untuk lihat detail
+        </summary>
+        <div class="p-5 pt-3 space-y-3">
+
+          <div class="issue-card rounded-lg p-4">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="badge-critical text-xs px-2 py-0.5 rounded font-medium">🔴 CRITICAL</span>
+              <span class="text-white text-sm font-medium">1. Query <code>where.not(status: :skipped)</code> include rejected ke Siebel</span>
+            </div>
+            <p class="text-slate-400 text-sm">File: <code class="text-slate-300">app/services/siebel_sftp_uploader_service.rb</code></p>
+            <p class="text-slate-400 text-sm mt-1">Query lama: <code class="text-amber-300">where(status: :approved)</code>. Query baru: <code class="text-amber-300">where.not(status: :skipped)</code>. Match: pending(0), approved(1), rejected(2). <strong>Rejected docs sekarang ikut sync ke Siebel CRM</strong> — itu dokumen yang gagal verifikasi, harusnya tidak pernah masuk ke CRM. Data integrity hancur.</p>
+            <p class="text-slate-500 text-xs mt-1 italic">Fix: pakai positive filter <code>where(status: [:approved])</code> atau eksplisit exclude rejected: <code>where(status: :approved).where.not(status: :skipped)</code>.</p>
+          </div>
+
+          <div class="issue-card rounded-lg p-4">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="badge-critical text-xs px-2 py-0.5 rounded font-medium">🔴 CRITICAL</span>
+              <span class="text-white text-sm font-medium">2. Status :delivery dihapus dari filter — tapi spec masih cek :delivery excluded</span>
+            </div>
+            <p class="text-slate-400 text-sm">File: <code class="text-slate-300">app/services/siebel_sftp_uploader_service.rb + spec</code></p>
+            <p class="text-slate-400 text-sm mt-1">Diff hapus <code>Order.statuses[:delivery]</code> dari array. Tapi spec baru tetap test ekspektasi <code>:delivery</code> orders TIDAK upload. Mismatch antara intent code dan spec → kemungkinan bug regression atau salah satu salah.</p>
+            <p class="text-slate-500 text-xs mt-1 italic">Fix: tentukan dulu apakah :delivery harus sync atau tidak, sinkronkan code & spec.</p>
+          </div>
+
+          <div class="issue-card rounded-lg p-4">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="badge-high text-xs px-2 py-0.5 rounded font-medium">🟠 HIGH</span>
+              <span class="text-white text-sm font-medium">3. Spec eksplisit ekspektasi rejected docs ter-upload ke Siebel</span>
+            </div>
+            <p class="text-slate-400 text-sm">File: <code class="text-slate-300">spec/services/siebel_sftp_uploader_service_spec.rb</code></p>
+            <p class="text-slate-400 text-sm mt-1">Test "uploads approved and rejected documents but skips skipped ones" eksplisit ekspektasi rejected_document_approval ter-upload. Spec validasi behavior yang salah dari business perspective.</p>
+          </div>
+
+          <div class="issue-card rounded-lg p-4">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="badge-medium text-xs px-2 py-0.5 rounded font-medium">🟡 MEDIUM</span>
+              <span class="text-white text-sm font-medium">4. Race condition di mark_documents_as_uploaded</span>
+            </div>
+            <p class="text-slate-400 text-sm">File: <code class="text-slate-300">app/services/siebel_sftp_uploader_service.rb</code></p>
+            <p class="text-slate-400 text-sm mt-1">CSV ditulis dulu, mark_documents_as_uploaded baru dipanggil end-of-batch via update_all. Jika service interrupt mid-flow (OOM, SIGTERM, timeout), file di SFTP sudah ada tapi flag <code>upload_siebel_sftp_at</code> belum di-set. Run berikutnya re-upload duplicate.</p>
+            <p class="text-slate-500 text-xs mt-1 italic">Fix: mark per-document segera setelah upload sukses, bukan batch end.</p>
+          </div>
+
+          <div class="issue-card rounded-lg p-4">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="badge-medium text-xs px-2 py-0.5 rounded font-medium">🟡 MEDIUM</span>
+              <span class="text-white text-sm font-medium">5. Pagination offset += failed_count rawan loop infinite</span>
+            </div>
+            <p class="text-slate-400 text-sm">File: <code class="text-slate-300">app/services/siebel_sftp_uploader_service.rb</code></p>
+            <p class="text-slate-400 text-sm mt-1">Jika satu batch gagal semua (Siebel down, SFTP timeout), offset hanya naik failed_count. Kalau ordering query change, possible reprocess same docs. ID-based pagination lebih aman.</p>
+          </div>
+
+        </div>
+      </details>
     </div>
 
-    <!-- !558 -->
-    <div class="card rounded-xl p-5">
-      <div class="flex flex-wrap items-start gap-3 mb-3">
-        <a href="https://mygitlab-dev.ioh.co.id/cco/cmo/group-digital-coe/div-smb-digital-product/ide-phoenix/-/merge_requests/558" target="_blank" class="mr-link font-mono text-sm font-bold">!558</a>
-        <span class="badge-risk-med text-xs px-2 py-0.5 rounded-full font-medium">⚡ Belum direview</span>
-        <span class="ml-auto text-xs text-slate-500">branch: s68/study/dashboard-usage-quota-product-types</span>
+    <!-- ============== !557 ============== -->
+    <div class="card rounded-xl overflow-hidden">
+      <div class="p-5">
+        <div class="flex flex-wrap items-start gap-3 mb-3">
+          <a href="https://mygitlab-dev.ioh.co.id/cco/cmo/group-digital-coe/div-smb-digital-product/ide-phoenix/-/merge_requests/557" target="_blank" class="mr-link font-mono text-sm font-bold">!557</a>
+          <span class="badge-risk-med text-xs px-2 py-0.5 rounded-full font-medium">⚠ MED-HIGH</span>
+          <span class="status-reviewed text-xs px-2 py-0.5 rounded-full">✓ 7 issues</span>
+          <span class="ml-auto text-xs text-slate-500">16 files · enhancement/label-group-feature</span>
+        </div>
+        <h2 class="text-white font-semibold mb-1">Label group feature: delete group, sort enhancement, i18n</h2>
+        <p class="text-slate-400 text-sm">Fitur label group MSISDN — delete, sorting, i18n. Touch dashboard customer + admin + JS controller.</p>
       </div>
-      <h2 class="text-white font-semibold mb-1">[feat] Add usage dashboard and quota fields for platinum_retail product type</h2>
-      <p class="text-slate-400 text-sm">Tambah field quota dan usage dashboard untuk tipe produk platinum_retail.</p>
+
+      <details>
+        <summary class="px-5 py-3 border-t border-slate-800 text-sm text-indigo-400 hover:text-indigo-300 flex items-center gap-2">
+          <span class="chevron">▶</span> 7 Issues — klik untuk lihat detail
+        </summary>
+        <div class="p-5 pt-3 space-y-3">
+
+          <div class="issue-card rounded-lg p-4">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="badge-high text-xs px-2 py-0.5 rounded font-medium">🟠 HIGH</span>
+              <span class="text-white text-sm font-medium">1. delete_group_label tanpa transaction wrapper</span>
+            </div>
+            <p class="text-slate-400 text-sm">File: <code class="text-slate-300">app/controllers/customers/dashboards_controller.rb</code></p>
+            <p class="text-slate-400 text-sm mt-1">Pakai <code class="text-amber-300">update_all</code> langsung tanpa transaction. Kalau gagal di tengah (DB connection drop, server crash), state DB partial — sebagian MSISDN lost label, sebagian tetap.</p>
+            <p class="text-slate-500 text-xs mt-1 italic">Fix: <code>ActiveRecord::Base.transaction { affected.update_all(...) }</code></p>
+          </div>
+
+          <div class="issue-card rounded-lg p-4">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="badge-high text-xs px-2 py-0.5 rounded font-medium">🟠 HIGH</span>
+              <span class="text-white text-sm font-medium">2. JS confirmDeleteGroup tidak cek HTTP status sebelum parse JSON</span>
+            </div>
+            <p class="text-slate-400 text-sm">File: <code class="text-slate-300">app/javascript/controllers/msisdn_group_edit_controller.js</code></p>
+            <p class="text-slate-400 text-sm mt-1"><code class="text-amber-300">await res.json()</code> dipanggil tanpa cek <code>res.ok</code>. Kalau server return 5xx dengan body HTML, parse error → unhandled promise rejection. User dapat alert kosong/aneh.</p>
+          </div>
+
+          <div class="issue-card rounded-lg p-4">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="badge-high text-xs px-2 py-0.5 rounded font-medium">🟠 HIGH</span>
+              <span class="text-white text-sm font-medium">3. Role check mismatch di dashboard_helper</span>
+            </div>
+            <p class="text-slate-400 text-sm">File: <code class="text-slate-300">app/helpers/dashboard_helper.rb</code></p>
+            <p class="text-slate-400 text-sm mt-1"><code>dashboard_i18n_namespace</code> cek <code class="text-amber-300">has_role?(:customer)</code>, tapi controller authorize via <code class="text-amber-300">has_role?(:user)</code>. Branch elsif tidak pernah ke-trigger — fallback selalu dipake. Effectively dead branch + i18n namespace bisa salah.</p>
+          </div>
+
+          <div class="issue-card rounded-lg p-4">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="badge-medium text-xs px-2 py-0.5 rounded font-medium">🟡 MEDIUM</span>
+              <span class="text-white text-sm font-medium">4. Hardcoded Indonesian fallback di JS controller</span>
+            </div>
+            <p class="text-slate-400 text-sm">File: <code class="text-slate-300">app/javascript/controllers/msisdn_group_edit_controller.js</code></p>
+            <p class="text-slate-400 text-sm mt-1">Fallback string i18n (Menyimpan..., Gagal menyimpan, dst) hardcoded Indonesian. User English-locale dapat pesan Indonesia kalau data attr missing.</p>
+          </div>
+
+          <div class="issue-card rounded-lg p-4">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="badge-medium text-xs px-2 py-0.5 rounded font-medium">🟡 MEDIUM</span>
+              <span class="text-white text-sm font-medium">5. Admin routes tidak punya delete_group_label endpoint</span>
+            </div>
+            <p class="text-slate-400 text-sm">File: <code class="text-slate-300">config/routes.rb</code></p>
+            <p class="text-slate-400 text-sm mt-1">Customer dashboards punya endpoint <code>:group_labels, :update_activation_group, :bulk_update_activation_group, :delete_group_label</code>. Admin dashboards cuma <code>:index, :usage</code>. Inkonsistensi — admin tidak bisa pakai fitur ini, padahal mungkin perlu untuk supervise.</p>
+          </div>
+
+          <div class="issue-card rounded-lg p-4">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="badge-low text-xs px-2 py-0.5 rounded font-medium">🟢 LOW</span>
+              <span class="text-white text-sm font-medium">6. Missing i18n key 'label' di locale files</span>
+            </div>
+            <p class="text-slate-400 text-sm">File: <code class="text-slate-300">app/views/shared/dashboards/_msisdn_group_block.html.erb</code></p>
+            <p class="text-slate-400 text-sm mt-1"><code>t("#{ns}.label")</code> dipanggil tapi key 'label' tidak ada di admin/en.yml & customers/en.yml. Akan tampil "translation missing".</p>
+          </div>
+
+          <div class="issue-card rounded-lg p-4">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="badge-low text-xs px-2 py-0.5 rounded font-medium">🟢 LOW</span>
+              <span class="text-white text-sm font-medium">7. Sort comparator tidak coalesce undefined dataset</span>
+            </div>
+            <p class="text-slate-400 text-sm">File: <code class="text-slate-300">app/javascript/controllers/msisdn_sort_controller.js</code></p>
+            <p class="text-slate-400 text-sm mt-1">Akses <code>data-sort-msisdn, data-sort-type</code> tanpa null-check. Row tanpa attribute → undefined comparison → unstable sort.</p>
+          </div>
+
+        </div>
+      </details>
     </div>
 
-    <!-- !557 -->
-    <div class="card rounded-xl p-5">
-      <div class="flex flex-wrap items-start gap-3 mb-3">
-        <a href="https://mygitlab-dev.ioh.co.id/cco/cmo/group-digital-coe/div-smb-digital-product/ide-phoenix/-/merge_requests/557" target="_blank" class="mr-link font-mono text-sm font-bold">!557</a>
-        <span class="badge-risk-med text-xs px-2 py-0.5 rounded-full font-medium">⚡ Belum direview</span>
-        <span class="ml-auto text-xs text-slate-500">branch: enhancement/label-group-feature</span>
+    <!-- ============== !558 ============== -->
+    <div class="card rounded-xl overflow-hidden">
+      <div class="p-5">
+        <div class="flex flex-wrap items-start gap-3 mb-3">
+          <a href="https://mygitlab-dev.ioh.co.id/cco/cmo/group-digital-coe/div-smb-digital-product/ide-phoenix/-/merge_requests/558" target="_blank" class="mr-link font-mono text-sm font-bold">!558</a>
+          <span class="badge-risk-med text-xs px-2 py-0.5 rounded-full font-medium">⚠ MEDIUM</span>
+          <span class="status-reviewed text-xs px-2 py-0.5 rounded-full">✓ 5 issues</span>
+          <span class="ml-auto text-xs text-slate-500">8 files · platinum_retail-quota</span>
+        </div>
+        <h2 class="text-white font-semibold mb-1">[feat] Add usage dashboard and quota fields for platinum_retail product type</h2>
+        <p class="text-slate-400 text-sm">Tambah quota fields & dashboard untuk product_type platinum_retail. Touch product model, helper, view admin.</p>
       </div>
-      <h2 class="text-white font-semibold mb-1">Label group feature: delete group, sort enhancement, i18n</h2>
-      <p class="text-slate-400 text-sm">Fitur label group — delete, sorting, dan perbaikan i18n.</p>
+
+      <details>
+        <summary class="px-5 py-3 border-t border-slate-800 text-sm text-indigo-400 hover:text-indigo-300 flex items-center gap-2">
+          <span class="chevron">▶</span> 5 Issues — klik untuk lihat detail
+        </summary>
+        <div class="p-5 pt-3 space-y-3">
+
+          <div class="issue-card rounded-lg p-4">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="badge-high text-xs px-2 py-0.5 rounded font-medium">🟠 HIGH</span>
+              <span class="text-white text-sm font-medium">1. quota_product? predicate tidak konsisten — verifikasi manual</span>
+            </div>
+            <p class="text-slate-400 text-sm">File: <code class="text-slate-300">app/models/product.rb</code></p>
+            <p class="text-slate-400 text-sm mt-1">Diff update <code>quota_product?</code> include platinum_retail. Tapi method serupa di model lain (mis: <code>show_quota_member_limit?</code>) dan helper masih cek <code>shared_quota? || fixed_quota?</code> manual. Inconsistency: field visibility config vs predicate vs view condition perlu di-grep ulang seluruhnya.</p>
+            <p class="text-slate-500 text-xs mt-1 italic">Action: <code>grep -rn "shared_quota? || fixed_quota?" app/</code> dan pastikan semua sudah pakai <code>quota_product?</code>.</p>
+          </div>
+
+          <div class="issue-card rounded-lg p-4">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="badge-medium text-xs px-2 py-0.5 rounded font-medium">🟡 MEDIUM</span>
+              <span class="text-white text-sm font-medium">2. View badge logic — color mismatch untuk platinum_retail</span>
+            </div>
+            <p class="text-slate-400 text-sm">File: <code class="text-slate-300">app/views/customers/dashboards/index.html.erb + admin</code></p>
+            <p class="text-slate-400 text-sm mt-1">Customer dashboard view masih ternary <code>shared_quota? ? blue : purple</code>, padahal MR ekspektasi platinum_retail = amber badge. Kalau view ini tidak diubah, badge salah.</p>
+          </div>
+
+          <div class="issue-card rounded-lg p-4">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="badge-medium text-xs px-2 py-0.5 rounded font-medium">🟡 MEDIUM</span>
+              <span class="text-white text-sm font-medium">3. Quota fields section condition di admin show</span>
+            </div>
+            <p class="text-slate-400 text-sm">File: <code class="text-slate-300">app/views/admin/products/show.html.erb</code></p>
+            <p class="text-slate-400 text-sm mt-1">Condition <code>@product.shared_quota? || @product.fixed_quota?</code> tidak include platinum_retail → admin form tidak render quota fields untuk platinum_retail. Helper config sudah include, tapi view block-nya.</p>
+          </div>
+
+          <div class="issue-card rounded-lg p-4">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="badge-medium text-xs px-2 py-0.5 rounded font-medium">🟡 MEDIUM</span>
+              <span class="text-white text-sm font-medium">4. Data quota label — per-MSISDN vs Pool</span>
+            </div>
+            <p class="text-slate-400 text-sm">File: <code class="text-slate-300">app/views/admin/products/show.html.erb</code></p>
+            <p class="text-slate-400 text-sm mt-1">Cek hanya <code>fixed_quota?</code> untuk per-MSISDN label. platinum_retail tampil label "Pool" yang salah.</p>
+          </div>
+
+          <div class="issue-card rounded-lg p-4">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="badge-low text-xs px-2 py-0.5 rounded font-medium">🟢 LOW</span>
+              <span class="text-white text-sm font-medium">5. Scope rename shared_or_fixed_quota → quota_products belum konsisten</span>
+            </div>
+            <p class="text-slate-400 text-sm">File: <code class="text-slate-300">app/models/product.rb</code></p>
+            <p class="text-slate-400 text-sm mt-1">Refactor scope ke nama baru tapi semua call site di-grep dulu. Kalau ada controller/view yang masih panggil scope lama → NoMethodError.</p>
+          </div>
+
+        </div>
+      </details>
     </div>
 
-    <!-- !555 -->
-    <div class="card rounded-xl p-5">
-      <div class="flex flex-wrap items-start gap-3 mb-3">
-        <a href="https://mygitlab-dev.ioh.co.id/cco/cmo/group-digital-coe/div-smb-digital-product/ide-phoenix/-/merge_requests/555" target="_blank" class="mr-link font-mono text-sm font-bold">!555</a>
-        <span class="badge-risk-med text-xs px-2 py-0.5 rounded-full font-medium">⚡ Belum direview</span>
-        <span class="ml-auto text-xs text-slate-500">branch: s68/phb-3262/fix-manage-order-search-sort-filter</span>
+    <!-- ============== !555 ============== -->
+    <div class="card rounded-xl overflow-hidden">
+      <div class="p-5">
+        <div class="flex flex-wrap items-start gap-3 mb-3">
+          <a href="https://mygitlab-dev.ioh.co.id/cco/cmo/group-digital-coe/div-smb-digital-product/ide-phoenix/-/merge_requests/555" target="_blank" class="mr-link font-mono text-sm font-bold">!555</a>
+          <span class="badge-risk-low text-xs px-2 py-0.5 rounded-full font-medium">✓ LOW RISK</span>
+          <span class="status-reviewed text-xs px-2 py-0.5 rounded-full">✓ 3 issues</span>
+          <span class="ml-auto text-xs text-slate-500">7 files · PHB-3262-fix-manage-order</span>
+        </div>
+        <h2 class="text-white font-semibold mb-1">[PHB-3262] fix: manage order search, sort, filter, and sim card 500 error</h2>
+        <p class="text-slate-400 text-sm">Fix manage order search/sort/filter & 500 error sim card. Scope kecil, mostly bug fixes.</p>
       </div>
-      <h2 class="text-white font-semibold mb-1">[PHB-3262] fix: manage order search, sort, filter, and sim card 500 error</h2>
-      <p class="text-slate-400 text-sm">Fix search/sort/filter pada manage order dan 500 error di sim card.</p>
+
+      <details>
+        <summary class="px-5 py-3 border-t border-slate-800 text-sm text-indigo-400 hover:text-indigo-300 flex items-center gap-2">
+          <span class="chevron">▶</span> 3 Issues — klik untuk lihat detail
+        </summary>
+        <div class="p-5 pt-3 space-y-3">
+
+          <div class="issue-card rounded-lg p-4">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="badge-medium text-xs px-2 py-0.5 rounded font-medium">🟡 MEDIUM</span>
+              <span class="text-white text-sm font-medium">1. order() pakai string key — inkonsisten dengan model lain</span>
+            </div>
+            <p class="text-slate-400 text-sm">File: <code class="text-slate-300">app/models/order.rb:736</code></p>
+            <p class="text-slate-400 text-sm mt-1"><code class="text-amber-300">orders.order(sort_column => safe_sort_direction)</code> — string key & string value. Rails Arel terima keduanya, tapi Lead.rb:186 dan Product.rb:283 pakai <code>.to_sym</code>. Inkonsistensi pattern, bukan bug langsung.</p>
+            <p class="text-slate-500 text-xs mt-1 italic">Note: agent original klaim ini HIGH; gue downgrade ke MEDIUM karena Rails accept string key di hash-form .order().</p>
+          </div>
+
+          <div class="issue-card rounded-lg p-4">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="badge-medium text-xs px-2 py-0.5 rounded font-medium">🟡 MEDIUM</span>
+              <span class="text-white text-sm font-medium">2. Test sort cuma cek not_to raise_error</span>
+            </div>
+            <p class="text-slate-400 text-sm">File: <code class="text-slate-300">spec/models/order_spec.rb:191-203</code></p>
+            <p class="text-slate-400 text-sm mt-1">Test "sorts asc/desc without raising" tidak verify hasil urutan beneran. Kalau sort silently broken, test tetap green. Sort test lain di file sama (line 2601+) sudah proper.</p>
+          </div>
+
+          <div class="issue-card rounded-lg p-4">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="badge-low text-xs px-2 py-0.5 rounded font-medium">🟢 LOW</span>
+              <span class="text-white text-sm font-medium">3. SQL injection check — pastikan whitelist sort_column</span>
+            </div>
+            <p class="text-slate-400 text-sm">File: <code class="text-slate-300">app/models/order.rb</code></p>
+            <p class="text-slate-400 text-sm mt-1">Sort column dari user input. Verify scope <code>filter_and_sort</code> punya allowlist column name (bukan whatever user kirim). Diff harus include validasi.</p>
+            <p class="text-slate-500 text-xs mt-1 italic">Action manual: cek implementation <code>filter_and_sort</code> punya <code>SORTABLE_COLUMNS = %w[...].freeze</code> + raise jika di luar allowlist.</p>
+          </div>
+
+        </div>
+      </details>
     </div>
 
-    <!-- !554 -->
-    <div class="card rounded-xl p-5">
-      <div class="flex flex-wrap items-start gap-3 mb-3">
-        <a href="https://mygitlab-dev.ioh.co.id/cco/cmo/group-digital-coe/div-smb-digital-product/ide-phoenix/-/merge_requests/554" target="_blank" class="mr-link font-mono text-sm font-bold">!554</a>
-        <span class="badge-risk-med text-xs px-2 py-0.5 rounded-full font-medium">⚡ Belum direview</span>
-        <span class="ml-auto text-xs text-slate-500">branch: PHB-3264-waive-fee-...</span>
+    <!-- ============== !554 ============== -->
+    <div class="card rounded-xl overflow-hidden">
+      <div class="p-5">
+        <div class="flex flex-wrap items-start gap-3 mb-3">
+          <a href="https://mygitlab-dev.ioh.co.id/cco/cmo/group-digital-coe/div-smb-digital-product/ide-phoenix/-/merge_requests/554" target="_blank" class="mr-link font-mono text-sm font-bold">!554</a>
+          <span class="badge-risk-med text-xs px-2 py-0.5 rounded-full font-medium">⚠ MED-HIGH</span>
+          <span class="status-reviewed text-xs px-2 py-0.5 rounded-full">✓ 8 issues</span>
+          <span class="ml-auto text-xs text-slate-500">32 files · PHB-3264-waive-fee</span>
+        </div>
+        <h2 class="text-white font-semibold mb-1">[PHB-3264] feat: adjust verification flow for fixed quota orders and returning customers (KYC)</h2>
+        <p class="text-slate-400 text-sm">Penyesuaian verification flow — fixed quota orders, returning customers, skip document, waive activation fee.</p>
       </div>
-      <h2 class="text-white font-semibold mb-1">[PHB-3264] feat: adjust verification flow for fixed quota orders and returning customers</h2>
-      <p class="text-slate-400 text-sm">Penyesuaian verification flow untuk fixed quota dan returning customers.</p>
+
+      <details>
+        <summary class="px-5 py-3 border-t border-slate-800 text-sm text-indigo-400 hover:text-indigo-300 flex items-center gap-2">
+          <span class="chevron">▶</span> 8 Issues — klik untuk lihat detail
+        </summary>
+        <div class="p-5 pt-3 space-y-3">
+
+          <div class="issue-card rounded-lg p-4">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="badge-high text-xs px-2 py-0.5 rounded font-medium">🟠 HIGH</span>
+              <span class="text-white text-sm font-medium">1. Race condition: skip_document! parallel call → double advance</span>
+            </div>
+            <p class="text-slate-400 text-sm">File: <code class="text-slate-300">app/models/document_approval.rb:111</code></p>
+            <p class="text-slate-400 text-sm mt-1">Cek <code>!order.payment_expired_at?</code> tanpa DB lock. Dua call parallel bisa lewat cek yang sama, dua-duanya <code>advance_order_to_payment!</code>. Akibat: duplicate VerificatorMailer.approval_notification, duplicate push notif, audit log duplikat.</p>
+            <p class="text-slate-500 text-xs mt-1 italic">Fix: <code>order.with_lock { ... }</code> atau guard <code>form_stage != :payment_stage</code>.</p>
+          </div>
+
+          <div class="issue-card rounded-lg p-4">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="badge-high text-xs px-2 py-0.5 rounded font-medium">🟠 HIGH</span>
+              <span class="text-white text-sm font-medium">2. Reload order tanpa refresh association document_approvals</span>
+            </div>
+            <p class="text-slate-400 text-sm">File: <code class="text-slate-300">app/models/document_approval.rb:101</code></p>
+            <p class="text-slate-400 text-sm mt-1">Setelah update document_approval status :skipped + purge attachment, code <code>order.reload</code> + cek <code>all_document_approved_and_optional_document_uploaded?</code>. Reload tidak refresh in-memory association — possibly stale data di method check.</p>
+            <p class="text-slate-500 text-xs mt-1 italic">Fix: pakai <code>order.reload(includes: :document_approvals)</code> atau pass updated state eksplisit.</p>
+          </div>
+
+          <div class="issue-card rounded-lg p-4">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="badge-medium text-xs px-2 py-0.5 rounded font-medium">🟡 MEDIUM</span>
+              <span class="text-white text-sm font-medium">3. Safe-nav <code>customer&.eligible_for_fast_track?</code> bypass restriction</span>
+            </div>
+            <p class="text-slate-400 text-sm">File: <code class="text-slate-300">app/controllers/customers/verifications_controller.rb:89</code></p>
+            <p class="text-slate-400 text-sm mt-1"><code>@order.customer&.eligible_for_fast_track?</code> — kalau customer nil, condition false, redirect tidak terjadi. Returning customer object tanpa linked customer record bisa bypass fast-track restriction.</p>
+          </div>
+
+          <div class="issue-card rounded-lg p-4">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="badge-medium text-xs px-2 py-0.5 rounded font-medium">🟡 MEDIUM</span>
+              <span class="text-white text-sm font-medium">4. State change order + approval tidak atomic (no transaction)</span>
+            </div>
+            <p class="text-slate-400 text-sm">File: <code class="text-slate-300">app/models/document_approval.rb:82</code></p>
+            <p class="text-slate-400 text-sm mt-1"><code>order.update!</code> dan <code>approval.update!</code> dua DB call terpisah tanpa transaction. Kalau approval.update gagal validasi, order.waive_activation_fee sudah ke-set false → state inconsistent.</p>
+          </div>
+
+          <div class="issue-card rounded-lg p-4">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="badge-medium text-xs px-2 py-0.5 rounded font-medium">🟡 MEDIUM</span>
+              <span class="text-white text-sm font-medium">5. skip_document! tanpa idempotency guard</span>
+            </div>
+            <p class="text-slate-400 text-sm">File: <code class="text-slate-300">app/models/document_approval.rb:66</code></p>
+            <p class="text-slate-400 text-sm mt-1">Method bisa dipanggil dua kali (Sidekiq retry, network retry, double-click). Tidak ada cek <code>return false if approval.skipped?</code> di awal. Akibat: duplicate VerificatorMailer.optional_document_skipped email.</p>
+          </div>
+
+          <div class="issue-card rounded-lg p-4">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="badge-medium text-xs px-2 py-0.5 rounded font-medium">🟡 MEDIUM</span>
+              <span class="text-white text-sm font-medium">6. returning_customer + fixed_quota → MoU validation gap</span>
+            </div>
+            <p class="text-slate-400 text-sm">File: <code class="text-slate-300">app/models/order.rb:593</code></p>
+            <p class="text-slate-400 text-sm mt-1"><code>all_required_documents_approved?</code> return true untuk returning_customer? tanpa cek <code>requires_mou?</code>. <code>requires_mou?</code> = !returning_customer?, tapi <code>fixed_quota_product?</code> bisa override. Possible gap: fixed quota re-order considered approved tanpa MoU.</p>
+          </div>
+
+          <div class="issue-card rounded-lg p-4">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="badge-medium text-xs px-2 py-0.5 rounded font-medium">🟡 MEDIUM</span>
+              <span class="text-white text-sm font-medium">7. Sales verification_stage_submit cek MoU tanpa reload</span>
+            </div>
+            <p class="text-slate-400 text-sm">File: <code class="text-slate-300">app/controllers/sales/verifications_controller.rb:38</code></p>
+            <p class="text-slate-400 text-sm mt-1"><code>@order.mou.attached? || !@order.requires_mou?</code> tanpa reload. Customer upload MoU paralel + sales klik verify → state stale, valid submission ditolak.</p>
+          </div>
+
+          <div class="issue-card rounded-lg p-4">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="badge-low text-xs px-2 py-0.5 rounded font-medium">🟢 LOW</span>
+              <span class="text-white text-sm font-medium">8. Mailer error tanpa explicit handler di skip_document!</span>
+            </div>
+            <p class="text-slate-400 text-sm">File: <code class="text-slate-300">app/models/document_approval.rb:91</code></p>
+            <p class="text-slate-400 text-sm mt-1"><code>deliver_later</code> tanpa rescue. Mailer config error → exception bubble ke generic <code>rescue => e</code> di controller. Mailer issues tertelan rescue umum, tidak mudah di-debug.</p>
+          </div>
+
+        </div>
+      </details>
     </div>
 
   </div>
 
   <!-- Footer -->
   <div class="mt-10 text-center text-xs text-slate-600">
-    Dibuat oleh Semar · Punakawan AI · review.hanif.app
+    Dibuat oleh Semar · Punakawan AI · review.hanif.app · last updated <span id="updated"></span>
   </div>
+  <script>
+    document.getElementById('updated').textContent = new Date().toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' });
+  </script>
 
 </div>
 
